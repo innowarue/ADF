@@ -1,0 +1,24 @@
+{
+	"name": "DestinationDataset_k7b",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "eventsDB_Snowflake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cw_table": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "SnowflakeTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "DBO",
+			"table": {
+				"value": "@dataset().cw_table",
+				"type": "Expression"
+			}
+		}
+	}
+}

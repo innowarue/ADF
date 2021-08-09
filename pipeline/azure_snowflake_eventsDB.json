@@ -1,0 +1,948 @@
+{
+	"name": "azure_snowflake_eventsDB",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach_k7b",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.cw_items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy_k7b",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [
+								{
+									"name": "Source",
+									"value": "dbo.@{item().source.table}"
+								},
+								{
+									"name": "Destination",
+									"value": "DBO.@{item().destination.table}"
+								}
+							],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SnowflakeSink",
+									"importSettings": {
+										"type": "SnowflakeImportCopyCommand"
+									}
+								},
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "stagingDataStore",
+										"type": "LinkedServiceReference"
+									},
+									"path": "snowflake"
+								},
+								"translator": {
+									"value": "@item().copyActivity.translator",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SourceDataset_k7b",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().source.table"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DestinationDataset_k7b",
+									"type": "DatasetReference",
+									"parameters": {
+										"cw_table": "@item().destination.table"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"cw_items": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"source": {
+							"table": "city"
+						},
+						"destination": {
+							"table": "CITY"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cityDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "CITYDESC",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "countryID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "STATEID",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "country"
+						},
+						"destination": {
+							"table": "COUNTRY"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "countryDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "COUNTRYDESC",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "customer"
+						},
+						"destination": {
+							"table": "CUSTOMER"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "firstName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FIRSTNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lastName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LASTNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "postalcodeID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "POSTALCODEID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "event"
+						},
+						"destination": {
+							"table": "EVENT"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EVENTNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventCode",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EVENTCODE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "venue",
+											"type": "String"
+										},
+										"sink": {
+											"name": "VENUE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "startDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "STARTDATE",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "endDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ENDDATE",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "recurring",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "RECURRING",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "frequencyOfReccurenceDays",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "FREQUENCYOFRECCURENCEDAYS",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "recurrenceDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "RECURRENCEDATE",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "expired",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EXPIRED",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "eventCategory"
+						},
+						"destination": {
+							"table": "EVENTCATEGORY"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventCategoryName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EVENTCATEGORYNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventCategoryCode",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EVENTCATEGORYCODE",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "eventInventory"
+						},
+						"destination": {
+							"table": "EVENTINVENTORY"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int64"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventCategoryID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTCATEGORYID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventOrganiserID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTORGANISERID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventResellerID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTRESELLERID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "transactionDate",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "TRANSACTIONDATE",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "noTicketsIssued",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "NOTICKETSISSUED",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "noTicketsOrdered",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "NOTICKETSORDERED",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "noTicketsOnHand",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "NOTICKETSONHAND",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ticketPrice",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "TICKETPRICE",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "percentCommision",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "PERCENTCOMMISION",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "noTicketsMaximum",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "NOTICKETSMAXIMUM",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "eventOrganiser"
+						},
+						"destination": {
+							"table": "EVENTORGANISER"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "firstname",
+											"type": "String"
+										},
+										"sink": {
+											"name": "FIRSTNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lastname",
+											"type": "String"
+										},
+										"sink": {
+											"name": "LASTNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "postalcodeID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "POSTALCODEID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "eventReseller"
+						},
+						"destination": {
+							"table": "EVENTRESELLER"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resellerName",
+											"type": "String"
+										},
+										"sink": {
+											"name": "RESELLERNAME",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "resellerCode",
+											"type": "String"
+										},
+										"sink": {
+											"name": "RESELLERCODE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "postalcodeID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "POSTALCODEID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "EMAIL",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "load_country"
+						},
+						"destination": {
+							"table": "LOAD_COUNTRY"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "countryDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "COUNTRYDESC",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "load_salesChannel"
+						},
+						"destination": {
+							"table": "LOAD_SALESCHANNEL"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "salesChannelDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "SALESCHANNELDESC",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "postalCode"
+						},
+						"destination": {
+							"table": "POSTALCODE"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "postalCodeDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "POSTALCODEDESC",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cityID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "CITYID",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "salesChannel"
+						},
+						"destination": {
+							"table": "SALESCHANNEL"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "id",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "salesChannelDesc",
+											"type": "String"
+										},
+										"sink": {
+											"name": "SALESCHANNELDESC",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					},
+					{
+						"source": {
+							"table": "ticketPurchase"
+						},
+						"destination": {
+							"table": "TICKETPURCHASE"
+						},
+						"copyActivity": {
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "transactionDate",
+											"type": "String"
+										},
+										"sink": {
+											"name": "TRANSACTIONDATE",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "transactionID",
+											"type": "Int64"
+										},
+										"sink": {
+											"name": "TRANSACTIONID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eventInventoryID",
+											"type": "Int64"
+										},
+										"sink": {
+											"name": "EVENTINVENTORYID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "customerID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "CUSTOMERID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "salesChannelID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "SALESCHANNELID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ResellerID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "RESELLERID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EventCategoryID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTCATEGORYID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EventID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "EVENTID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganiserID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "ORGANISERID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "transactionSourceID",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "TRANSACTIONSOURCEID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "quantity",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "QUANTITY",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "salesDollars",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "SALESDOLLARS",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "commision",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "COMMISION",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "basketID",
+											"type": "String"
+										},
+										"sink": {
+											"name": "BASKETID",
+											"type": "String"
+										}
+									}
+								]
+							}
+						}
+					}
+				]
+			}
+		},
+		"annotations": []
+	}
+}
